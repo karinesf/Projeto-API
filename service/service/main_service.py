@@ -3,52 +3,49 @@ import json
 from loguru import logger
 from service.constants import mensagens
 import pandas as pd
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import requests as rq
 
 
-class VaderService():
+class ConsultaCep():
 
     def __init__(self):
         logger.debug(mensagens.INICIO_LOAD_SERVICO)
-        self.load_model()
+        self.load_servico()
 
-    def load_model(self):
+    def load_servico(self):
         """"
-        Carrega o modelo VADER a ser usado
+        Carrega o servico de consulta de CEP
         """
 
-        #self.model = SentimentIntensityAnalyzer()
-
-        logger.debug(mensagens.FIM_LOAD_MODEL)
+        logger.debug(mensagens.FIM_LOAD_SERVICO)
 
     def executar_rest(self, texts):
         response = {}
 
-        logger.debug(mensagens.INICIO_PREDICT)
+        logger.debug(mensagens.INICIO_CONSULTA)
         start_time = time.time()
 
-        response_predicts = self.buscar_predicao(texts['textoMensagem'])
+        response_consulta = self.consulta_cep(texts['textoMensagem'])
 
-        logger.debug(mensagens.FIM_PREDICT)
-        logger.debug(f"Fim de todas as predições em {time.time()-start_time}")
+        logger.debug(mensagens.FIM_CONSULTA)
+        logger.debug(f"Fim de todas as consultas em {time.time()-start_time}")
 
         df_response = pd.DataFrame(texts, columns=['textoMensagem'])
-        df_response['predict'] = response_predicts
+        df_response['consulta'] = response_consulta
 
         df_response = df_response.drop(columns=['textoMensagem'])
 
         response = {
-                     "listaClassificacoes": json.loads(df_response.to_json(
+                     "listaConsultas": json.loads(df_response.to_json(
                                                                             orient='records', force_ascii=False))}
 
         return response
 
-    def buscar_predicao(self, texts):
+    def consulta_cep(self, texts):
         """
         Pega o modelo carregado e aplica em texts
         """
-        logger.debug('Iniciando o predict...')
+        logger.debug('Iniciando a consulta...')
 
         response = []
 
@@ -59,19 +56,3 @@ class VaderService():
                 response.append(resp.json())
 
         return response
-
-
-        '''sentiment_dict = self.model.polarity_scores(text)
-
-            # decide sentiment as positive, negative and neutral
-            if sentiment_dict['compound'] >= 0.05:
-                response.append("Positive")
-
-            elif sentiment_dict['compound'] <= - 0.05:
-                response.append("Negative")
-
-            else:
-                response.append("Neutral")
-
-        return response
-        '''
