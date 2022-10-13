@@ -43,7 +43,7 @@ class ConsultaCep():
 
     def consulta_cep(self, texts):
         """
-        Pega o modelo carregado e aplica em texts
+        Faz a consulta do CEP e retona as informaçõs dele
         """
         logger.debug('Iniciando a consulta...')
 
